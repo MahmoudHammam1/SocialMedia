@@ -1,5 +1,6 @@
 import requests
 import logging
+import json
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 
@@ -16,7 +17,34 @@ class FacebookPostManager:
         self.page_id = page_id
         self.api_url = f"https://graph.facebook.com/v21.0/{self.page_id}/feed"
 
-    def create_post(self, message, link=None, media_url=None):
+    def upload_photo(self, image_url):
+        """
+        Uploads an image to the Facebook Page.
+
+        Parameters:
+            image_url (str): The external image URL.
+
+        Returns:
+            str: Media ID if successful, None otherwise.
+        """
+        upload_url = f"https://graph.facebook.com/v21.0/{self.page_id}/photos"
+        payload = {
+            "url": image_url,
+            "published": "false",
+            "access_token": self.access_token
+        }
+
+        response = requests.post(upload_url, data=payload)
+        data = response.json()
+
+        if "id" in data:
+            logging.info(f"✅ Image Uploaded Successfully! Media ID: {data['id']}")
+            return data["id"]
+        else:
+            logging.error(f"❌ Failed to upload image: {data}")
+            return None
+
+    def create_post(self, message=None, link=None, media_url=None):
         """
         Creates a post on the Facebook Page.
 
@@ -29,12 +57,25 @@ class FacebookPostManager:
             str: Post ID if successful, None otherwise.
         """
 
-        post_data = {"message": message, "access_token": self.access_token}
+        post_data = {"access_token": self.access_token}
+
+        if message:
+            post_data["message"] = message
 
         if link:
             post_data["link"] = link
+
         if media_url:
-            post_data["attached_media"] = [{"media_fbid": media_url}]
+            media_id = self.upload_photo(media_url)
+            if media_id:
+                post_data["attached_media"] = json.dumps([{"media_fbid": media_id}])
+            else:
+                logging.error("❌ Image upload failed. Skipping media attachment.")
+                return None
+
+        if not ("message" in post_data or "link" in post_data or "attached_media" in post_data):
+            logging.error("❌ Error: At least one of message, link, or media must be provided.")
+            return None
 
         response = requests.post(self.api_url, data=post_data)
         data = response.json()
