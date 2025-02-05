@@ -16,9 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ACCESS_TOKEN = "EAAhuDPwr9MEBOzFJKJYXr0nIptVseSK3GTg109Iwo6xVnXYqHTUSfIxsMWWeeiEVpcwDk1nj53bwkjFZAtHvSRKGy1SyYGGi9J8w8OyCmypeZANU3qBp5vd0OHvZBQ8CDgpvJat57h5nCykPvZBUh0HBYaZAzsQMG8xyzshUAYxfbUIXZC2aT93dQQ3UTLhit0slFT5VdlHI9H0ZBhKzymTvB3ZA"
-AD_ACCOUNT_ID = "act_2103901970056396"
-PAGE_ID = "541346659065405"
+ACCESS_TOKEN = "facebook_page_access_token"
+AD_ACCOUNT_ID = "act_ + ad_account_id"
+PAGE_ID = "page_id"
 UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
